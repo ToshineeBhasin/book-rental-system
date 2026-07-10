@@ -7,6 +7,7 @@ import org.bookrental.dto.request.BookRequest;
 import org.bookrental.dto.response.BookResponse;
 import org.bookrental.entity.Book;
 import org.bookrental.exception.BookAlreadyExistsException;
+import org.bookrental.exception.BookNotFoundException;
 import org.bookrental.repository.BookRepository;
 import org.bookrental.service.BookService;
 import org.springframework.stereotype.Service;
@@ -83,5 +84,26 @@ public class BookServiceImpl implements BookService {
         return new ApiResponse<>(
                 ResponseStatus.SUCCESS, "Books fetched successfully " ,bookresponse
         );
+    }
+
+    public ApiResponse<BookResponse> getBookById(Long id){
+
+        Book book = bookRepository.findById(id).orElseThrow(
+                ()-> new BookNotFoundException("Book not found with id : " + id)
+        );
+        //orElseThrow() is used to retrieve the value from an Optional when present, otherwise it throws the supplied exception.
+        //It avoids manual null checking and makes the failure case explicit.
+        BookResponse bookResponse = new BookResponse(
+                book.getId(),
+                book.getAuthor(),
+                book.getCategory(),
+                book.getTitle(),
+                book.getIsbn(),
+                book.getAvailableCopies(),
+                book.getTotalCopies()
+        );
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS, "Book Fetched Sucessfully" , bookResponse
+                );
     }
 }

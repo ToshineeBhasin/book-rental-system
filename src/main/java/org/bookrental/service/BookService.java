@@ -13,5 +13,5 @@ public interface BookService {
     //List<Book> getAllBooks();
     ApiResponse<BookResponse>  addBook(BookRequest bookRequest);
     ApiResponse<List<BookResponse>> getAllBooks();  //response wrapper ke andar list of books rahegi
-
+    ApiResponse<BookResponse> getBookById(Long id);
 }

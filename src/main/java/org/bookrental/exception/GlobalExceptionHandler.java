@@ -39,6 +39,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>( response, HttpStatus.CONFLICT );
 
     }
+
+    @ExceptionHandler(BookNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBookNotFoundException(BookNotFoundException exception){
+        ApiResponse<Object> response = new ApiResponse<>(
+                ResponseStatus.FAILED,
+                exception.getMessage(),
+                null
+        );
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
 }
 //From the exception,
 //get the validation report,
