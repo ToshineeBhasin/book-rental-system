@@ -1,6 +1,9 @@
 
 package org.bookrental.controller;
 
+import org.bookrental.dto.common.ApiResponse;
+import org.bookrental.dto.request.BookRequest;
+import org.bookrental.dto.response.BookResponse;
 import org.bookrental.entity.Book;
 import org.bookrental.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +24,12 @@ public class BookController {
     }
 
     @PostMapping
-    public BookResponse addBook(@Valid  @RequestBody BookRequest bookRequest){
+    public ApiResponse<BookResponse> addBook(@Valid @RequestBody BookRequest bookRequest){
         return bookService.addBook(bookRequest);
     }
 
     @GetMapping("/getAllBooks")
-    public List<Book> getAllBooks(){
+    public ApiResponse<List<BookResponse>> getAllBooks(){
         return bookService.getAllBooks();
     }
 }
