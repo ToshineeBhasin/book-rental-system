@@ -60,6 +60,45 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response,HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUserNotFoundException(UserNotFoundException exception) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        ResponseStatus.FAILED,
+                        exception.getMessage(),
+                        null
+                ),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(BookNotAvailableException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBookNotAvailableException(BookNotAvailableException exception) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        ResponseStatus.FAILED,
+                        exception.getMessage(),
+                        null
+                ),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler({RentalLimitExceededException.class, BookAlreadyRentedException.class})
+    public ResponseEntity<ApiResponse<Object>> handleRentalBusinessExceptions(RuntimeException exception) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        ResponseStatus.FAILED,
+                        exception.getMessage(),
+                        null
+                ),
+                HttpStatus.CONFLICT
+        );
+    }
 }
 //From the exception,
 //get the validation report,

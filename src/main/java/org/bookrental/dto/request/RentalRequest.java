@@ -1,0 +1,38 @@
+package org.bookrental.dto.request;
+
+import javax.validation.constraints.NotNull;
+
+public class RentalRequest
+{
+    @NotNull(message = "User id is required")
+    private Long userId;
+
+    @NotNull(message = "Book id is required")
+    private Long bookId;
+
+    public RentalRequest() {
+    }
+
+    public RentalRequest(Long userId, Long bookId) {
+        this.userId = userId;
+        this.bookId = bookId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(Long bookId) {
+        this.bookId = bookId;
+    }
+
+
+}
