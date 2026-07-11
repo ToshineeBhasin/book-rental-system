@@ -49,6 +49,17 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUserAlreadyExistsException(UserAlreadyExistsException exception){
+        ApiResponse<Object> response = new ApiResponse<>(
+             ResponseStatus.FAILED,
+             exception.getMessage(),
+             null
+        );
+
+        return new ResponseEntity<>(response,HttpStatus.CONFLICT);
+    }
 }
 //From the exception,
 //get the validation report,
