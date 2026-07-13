@@ -6,10 +6,7 @@ import org.bookrental.dto.response.RentalResponse;
 import org.bookrental.service.RentalService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -29,6 +26,14 @@ public class RentalController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(rentalService.rentBook(rentalRequest));
+    }
+
+    @PutMapping("/{rentalId}/return")
+    public ResponseEntity<ApiResponse<RentalResponse>> returnBook(@PathVariable Long rentalId) {
+
+        return ResponseEntity.ok(
+                rentalService.returnBook(rentalId)
+        );
     }
 
 }

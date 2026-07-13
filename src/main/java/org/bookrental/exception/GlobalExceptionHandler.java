@@ -74,34 +74,34 @@ public class GlobalExceptionHandler {
         );
     }
 
-//    @ExceptionHandler(BookNotAvailableException.class)
-//    public ResponseEntity<ApiResponse<Object>> handleBookNotAvailableException(BookNotAvailableException exception) {
-//
-//        return new ResponseEntity<>(
-//                new ApiResponse<>(
-//                        ResponseStatus.FAILED,
-//                        exception.getMessage(),
-//                        null
-//                ),
-//                HttpStatus.CONFLICT
-//        );
-//    }
-
-//    @ExceptionHandler({RentalLimitExceededException.class, BookAlreadyRentedException.class})
-//    public ResponseEntity<ApiResponse<Object>> handleRentalBusinessExceptions(RuntimeException exception) {
-//
-//        return new ResponseEntity<>(
-//                new ApiResponse<>(
-//                        ResponseStatus.FAILED,
-//                        exception.getMessage(),
-//                        null
-//                ),
-//                HttpStatus.CONFLICT
-//        );
-//    }
-
     @ExceptionHandler({BookNotAvailableException.class, BookAlreadyRentedException.class, RentalLimitExceededException.class, InvalidRentalOperationException.class })
     public ResponseEntity<ApiResponse<Object>> handleRentalBusinessException(RuntimeException exception) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        ResponseStatus.FAILED,
+                        exception.getMessage(),
+                        null
+                ),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(RentalNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleRentalNotFoundException(RentalNotFoundException exception) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        ResponseStatus.FAILED,
+                        exception.getMessage(),
+                        null
+                ),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(BookAlreadyReturnedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBookAlreadyReturnedException(BookAlreadyReturnedException exception) {
 
         return new ResponseEntity<>(
                 new ApiResponse<>(

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class RentalServiceImpl implements RentalService {
@@ -128,6 +129,71 @@ public class RentalServiceImpl implements RentalService {
         return new ApiResponse<>(
                 ResponseStatus.SUCCESS,
                 "Book rented successfully",
+                rentalResponse
+        );
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<RentalResponse> returnBook(Long rentalId) {
+
+        Rental rental = rentalRepository.findById(rentalId)
+                .orElseThrow(() ->
+                        new RentalNotFoundException(
+                                "Rental not found with id: " + rentalId
+                        )
+                );
+
+        if (rental.getStatus() == RentalStatus.RETURNED) {
+            throw new BookAlreadyReturnedException(
+                    "Book has already been returned"
+            );
+        }
+
+        LocalDate returnDate = LocalDate.now();
+
+        double fineAmount = 0.0;
+
+        if (returnDate.isAfter(rental.getDueDate())) {
+
+            long lateDays = ChronoUnit.DAYS.between(
+                    rental.getDueDate(),
+                    returnDate
+            );
+
+            fineAmount = lateDays * 10.0;
+        }
+
+        rental.setReturnDate(returnDate);
+        rental.setStatus(RentalStatus.RETURNED);
+        rental.setFineAmount(fineAmount);
+
+        Book book = rental.getBook();
+
+        book.setAvailableCopies(
+                book.getAvailableCopies() + 1
+        );
+
+        bookRepository.save(book);
+
+        Rental updatedRental = rentalRepository.save(rental);
+
+        RentalResponse rentalResponse = new RentalResponse(
+                updatedRental.getId(),
+                updatedRental.getUser().getId(),
+                updatedRental.getUser().getName(),
+                updatedRental.getBook().getId(),
+                updatedRental.getBook().getTitle(),
+                updatedRental.getRentalDate(),
+                updatedRental.getDueDate(),
+                updatedRental.getReturnDate(),
+                updatedRental.getStatus(),
+                updatedRental.getFineAmount()
+        );
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                "Book returned successfully",
                 rentalResponse
         );
     }
