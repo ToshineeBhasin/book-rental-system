@@ -24,11 +24,11 @@ public class RentalController {
     }
 
     @PostMapping("/rent")
-    public ResponseEntity<ApiResponse<RentalResponse>> rentBook(
-            @Valid @RequestBody RentalRequest rentalRequest) {
+    public ResponseEntity<ApiResponse<RentalResponse>> rentBook(@Valid @RequestBody RentalRequest rentalRequest) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(rentalService.rentBook(rentalRequest));
     }
+
 }
