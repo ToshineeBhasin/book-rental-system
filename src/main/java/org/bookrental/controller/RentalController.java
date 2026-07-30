@@ -7,6 +7,7 @@ import org.bookrental.service.RentalService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -35,5 +36,49 @@ public class RentalController {
                 rentalService.returnBook(rentalId)
         );
     }
+
+    @GetMapping("/{rentalId}")
+    public ResponseEntity<ApiResponse<RentalResponse>> getRentalById(
+            @PathVariable Long rentalId) {
+
+        return ResponseEntity.ok(
+                rentalService.getRentalById(rentalId)
+        );
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<List<RentalResponse>>> getRentalsByUserId(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                rentalService.getRentalsByUserId(userId)
+        );
+    }
+
+    @GetMapping("/book/{bookId}")
+    public ResponseEntity<ApiResponse<List<RentalResponse>>> getRentalsByBookId(
+            @PathVariable Long bookId) {
+
+        return ResponseEntity.ok(
+                rentalService.getRentalsByBookId(bookId)
+        );
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse<List<RentalResponse>>> getActiveRentals() {
+
+        return ResponseEntity.ok(
+                rentalService.getActiveRentals()
+        );
+    }
+
+    @GetMapping("/overdue")
+    public ResponseEntity<ApiResponse<List<RentalResponse>>> getOverdueRentals() {
+
+        return ResponseEntity.ok(
+                rentalService.getOverdueRentals()
+        );
+    }
+
 
 }
