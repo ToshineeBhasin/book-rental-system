@@ -204,18 +204,7 @@ public class RentalServiceImpl implements RentalService {
     public ApiResponse<RentalResponse> getRentalById(Long rentalId){
         Rental rental = rentalRepository.findById(rentalId).orElseThrow(()-> new RentalNotFoundException("Rental not found with Id : " + rentalId));
 
-        RentalResponse rentalResponse = new RentalResponse(
-                rental.getId(),
-                rental.getUser().getId(),
-                rental.getUser().getName(),
-                rental.getBook().getId(),
-                rental.getBook().getTitle(),
-                rental.getRentalDate(),
-                rental.getDueDate(),
-                rental.getReturnDate(),
-                rental.getStatus(),
-                rental.getFineAmount()
-        );
+        RentalResponse rentalResponse = convertToRentalResponse(rental);
 
         return new ApiResponse<>(
                 ResponseStatus.SUCCESS,"rental fetched successfully. ",rentalResponse
@@ -237,20 +226,8 @@ public class RentalServiceImpl implements RentalService {
 
         for (Rental rental : rentals) {
 
-            RentalResponse rentalResponse = new RentalResponse(
-                    rental.getId(),
-                    rental.getUser().getId(),
-                    rental.getUser().getName(),
-                    rental.getBook().getId(),
-                    rental.getBook().getTitle(),
-                    rental.getRentalDate(),
-                    rental.getDueDate(),
-                    rental.getReturnDate(),
-                    rental.getStatus(),
-                    rental.getFineAmount()
-            );
+            rentalResponses.add(convertToRentalResponse(rental));
 
-            rentalResponses.add(rentalResponse);
         }
 
         String message = rentalResponses.isEmpty()
@@ -279,20 +256,7 @@ public class RentalServiceImpl implements RentalService {
 
         for (Rental rental : rentals) {
 
-            RentalResponse rentalResponse = new RentalResponse(
-                    rental.getId(),
-                    rental.getUser().getId(),
-                    rental.getUser().getName(),
-                    rental.getBook().getId(),
-                    rental.getBook().getTitle(),
-                    rental.getRentalDate(),
-                    rental.getDueDate(),
-                    rental.getReturnDate(),
-                    rental.getStatus(),
-                    rental.getFineAmount()
-            );
-
-            rentalResponses.add(rentalResponse);
+               rentalResponses.add(convertToRentalResponse(rental));
         }
 
         String message = rentalResponses.isEmpty()
@@ -314,21 +278,7 @@ public class RentalServiceImpl implements RentalService {
         List<RentalResponse> rentalResponses = new ArrayList<>();
 
         for (Rental rental : rentals) {
-
-            RentalResponse rentalResponse = new RentalResponse(
-                    rental.getId(),
-                    rental.getUser().getId(),
-                    rental.getUser().getName(),
-                    rental.getBook().getId(),
-                    rental.getBook().getTitle(),
-                    rental.getRentalDate(),
-                    rental.getDueDate(),
-                    rental.getReturnDate(),
-                    rental.getStatus(),
-                    rental.getFineAmount()
-            );
-
-            rentalResponses.add(rentalResponse);
+                rentalResponses.add(convertToRentalResponse(rental));
         }
 
         return new ApiResponse<>(
@@ -350,27 +300,29 @@ public class RentalServiceImpl implements RentalService {
         List<RentalResponse> rentalResponses = new ArrayList<>();
 
         for (Rental rental : rentals) {
-
-            RentalResponse rentalResponse = new RentalResponse(
-                    rental.getId(),
-                    rental.getUser().getId(),
-                    rental.getUser().getName(),
-                    rental.getBook().getId(),
-                    rental.getBook().getTitle(),
-                    rental.getRentalDate(),
-                    rental.getDueDate(),
-                    rental.getReturnDate(),
-                    rental.getStatus(),
-                    rental.getFineAmount()
-            );
-
-            rentalResponses.add(rentalResponse);
+            rentalResponses.add(convertToRentalResponse(rental));
         }
 
         return new ApiResponse<>(
                 ResponseStatus.SUCCESS,
                 "Overdue rentals fetched successfully",
                 rentalResponses
+        );
+    }
+
+    private RentalResponse convertToRentalResponse(Rental rental) {
+
+        return new RentalResponse(
+                rental.getId(),
+                rental.getUser().getId(),
+                rental.getUser().getName(),
+                rental.getBook().getId(),
+                rental.getBook().getTitle(),
+                rental.getRentalDate(),
+                rental.getDueDate(),
+                rental.getReturnDate(),
+                rental.getStatus(),
+                rental.getFineAmount()
         );
     }
 }

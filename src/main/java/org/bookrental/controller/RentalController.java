@@ -37,7 +37,7 @@ public class RentalController {
         );
     }
 
-    @GetMapping("/{rentalId}")
+    @GetMapping("/{rentalId:\\d+}")  // \\d+ means only numeric values are accepted.
     public ResponseEntity<ApiResponse<RentalResponse>> getRentalById(
             @PathVariable Long rentalId) {
 

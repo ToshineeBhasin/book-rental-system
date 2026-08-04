@@ -6,12 +6,10 @@ import org.bookrental.dto.response.UserResponse;
 import org.bookrental.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RequestMapping("/api/users")
 @RestController
@@ -28,4 +26,30 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(userRequest));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long id) {
+
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
+
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequest userRequest) {
+
+        return ResponseEntity.ok(userService.updateUser(id, userRequest) );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+
+        return ResponseEntity.ok(userService.deleteUser(id));
+    }
+
+
 }
