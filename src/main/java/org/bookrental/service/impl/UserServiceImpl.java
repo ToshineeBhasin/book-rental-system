@@ -9,6 +9,7 @@ import org.bookrental.exception.UserAlreadyExistsException;
 import org.bookrental.exception.UserNotFoundException;
 import org.bookrental.repository.UserRepository;
 import org.bookrental.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,9 +19,11 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository){
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public ApiResponse<UserResponse>  registerUser(UserRequest userRequest){
@@ -31,7 +34,9 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
-        user.setPassword(userRequest.getPassword());
+        String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
+
+        user.setPassword(encodedPassword);
         user.setRole(userRequest.getRole());
 
         User savedUser = userRepository.save(user);

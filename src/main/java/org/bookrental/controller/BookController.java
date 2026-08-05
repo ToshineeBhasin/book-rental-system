@@ -31,7 +31,7 @@ public class BookController {
         return bookService.addBook(bookRequest);
     }
 
-    @GetMapping("/getAllBooks")
+    @GetMapping
     public ApiResponse<List<BookResponse>> getAllBooks(){
         return bookService.getAllBooks();
     }

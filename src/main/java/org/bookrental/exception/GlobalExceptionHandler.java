@@ -5,6 +5,7 @@ import org.bookrental.dto.common.ApiResponse;
 import org.bookrental.common.enums.ResponseStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -110,6 +111,21 @@ public class GlobalExceptionHandler {
                         null
                 ),
                 HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBadCredentials(BadCredentialsException exception) {
+
+        ApiResponse<Object> response = new ApiResponse<>(
+                ResponseStatus.FAILED,
+                "Invalid email or password",
+                null
+        );
+
+        return new ResponseEntity<>(
+                response,
+                HttpStatus.UNAUTHORIZED
         );
     }
 }
