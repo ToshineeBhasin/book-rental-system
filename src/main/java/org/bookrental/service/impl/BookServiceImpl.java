@@ -17,7 +17,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 //BookRequest → Book Entity → DB → BookResponse → ApiResponse
@@ -69,22 +72,20 @@ public class BookServiceImpl implements BookService {
     @Override
     public ApiResponse<List<BookResponse>> getAllBooks() {
         List<Book> books = bookRepository.findAll();
-        List<BookResponse> bookresponse = new ArrayList<>();
-
-        for(Book book : books){
-            BookResponse response = new BookResponse(
-                    book.getId(),
-                    book.getTitle(),
-                    book.getAuthor(),
-                    book.getCategory(),
-                    book.getIsbn(),
-                    book.getTotalCopies(),
-                    book.getAvailableCopies()
-            );
-
-            bookresponse.add(response);
-
-        }
+        List<BookResponse> bookresponse = books.stream().map(this::convertToBookResponse).collect(Collectors.toList());
+//                = new ArrayList<>();
+//        for(Book book : books){
+//            BookResponse response = new BookResponse(
+//                    book.getId(),
+//                    book.getTitle(),
+//                    book.getAuthor(),
+//                    book.getCategory(),
+//                    book.getIsbn(),
+//                    book.getTotalCopies(),
+//                    book.getAvailableCopies()
+//            );
+//            bookresponse.add(response);
+//        }
         return new ApiResponse<>(
                 ResponseStatus.SUCCESS, "Books fetched successfully " ,bookresponse
         );
@@ -215,4 +216,95 @@ public class BookServiceImpl implements BookService {
         );
 
     }
+
+    @Override
+    public ApiResponse<List<BookResponse>> getAvailableBooks(){
+        List<Book> book = bookRepository.findAll();
+
+        List<BookResponse> availableBooks = book.stream().filter(books -> books.getAvailableCopies() > 0).map(this::convertToBookResponse).collect(Collectors.toList());
+
+        String message = availableBooks.isEmpty() ? "No Books are currently available." : "Available books fetched successfully." ;
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                message,
+                availableBooks
+        );
+    }
+
+    @Override
+    public ApiResponse<Boolean> isCategoryAvailable(String category) {
+
+        List<Book> books = bookRepository.findAll();
+
+        boolean available = books.stream().anyMatch(book ->book.getCategory().equalsIgnoreCase(category) && book.getAvailableCopies() > 0 );
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                available
+                        ? "Books are available in this category"
+                        : "No available books found in this category",
+                available
+        );
+    }
+
+    public ApiResponse<BookResponse> getFirstAvailableBookByCategory(String category){
+
+        Book book = bookRepository.findAll().stream().filter(currentBook -> currentBook.getCategory().equalsIgnoreCase(category) && currentBook.getAvailableCopies() > 0 )
+                .findFirst().orElseThrow(()-> new BookNotFoundException("No available book found in category." + category));
+
+        BookResponse bookResponse = convertToBookResponse(book);
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                "First available book fetched successfully",
+                bookResponse
+        );
+    }
+
+    @Override
+    public ApiResponse<List<BookResponse>> getBooksSortedByAvailableCopies() {
+
+        List<BookResponse> bookResponses = bookRepository.findAll().stream().sorted(Comparator.comparing(Book::getAvailableCopies).reversed()
+                        )
+                        .map(this::convertToBookResponse)
+                        .collect(Collectors.toList());
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                "Books sorted by available copies successfully",
+                bookResponses
+        );
+    }
+
+    @Override
+    public ApiResponse<Map<String, Long>> getBookCountByCategory() {
+
+        Map<String, Long> categoryCount = bookRepository.findAll().stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        Book::getCategory,
+                                        Collectors.counting()
+                                )
+                        );
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                "Category-wise book count fetched successfully",
+                categoryCount
+        );
+    }
+
+    private BookResponse convertToBookResponse(Book book){
+        return new BookResponse(
+                book.getId(),
+                book.getAuthor(),
+                book.getCategory(),
+                book.getTitle(),
+                book.getIsbn(),
+                book.getAvailableCopies(),
+                book.getTotalCopies()
+        );
+    }
+
 }

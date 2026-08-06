@@ -20,7 +20,10 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class RentalServiceImpl implements RentalService {
@@ -222,13 +225,11 @@ public class RentalServiceImpl implements RentalService {
 
         List<Rental> rentals = rentalRepository.findByUserId(userId);
 
-        List<RentalResponse> rentalResponses = new ArrayList<>();
-
-        for (Rental rental : rentals) {
-
-            rentalResponses.add(convertToRentalResponse(rental));
-
-        }
+        List<RentalResponse> rentalResponses = rentals.stream().map(this::convertToRentalResponse).collect(Collectors.toList());
+//                new ArrayList<>();
+//        for (Rental rental : rentals) {
+//            rentalResponses.add(convertToRentalResponse(rental));
+//        }
 
         String message = rentalResponses.isEmpty()
                 ? "No rental history found for user"
@@ -252,12 +253,11 @@ public class RentalServiceImpl implements RentalService {
 
         List<Rental> rentals = rentalRepository.findByBookId(bookId);
 
-        List<RentalResponse> rentalResponses = new ArrayList<>();
-
-        for (Rental rental : rentals) {
-
-               rentalResponses.add(convertToRentalResponse(rental));
-        }
+        List<RentalResponse> rentalResponses = rentals.stream().map(this::convertToRentalResponse).collect(Collectors.toList());
+//                new ArrayList<>();
+//        for (Rental rental : rentals) {
+//               rentalResponses.add(convertToRentalResponse(rental));
+//        }
 
         String message = rentalResponses.isEmpty()
                 ? "No rental history found for book"
@@ -275,11 +275,11 @@ public class RentalServiceImpl implements RentalService {
 
         List<Rental> rentals = rentalRepository.findByStatus(RentalStatus.RENTED);
 
-        List<RentalResponse> rentalResponses = new ArrayList<>();
-
-        for (Rental rental : rentals) {
-                rentalResponses.add(convertToRentalResponse(rental));
-        }
+        List<RentalResponse> rentalResponses = rentals.stream().map(this::convertToRentalResponse).collect(Collectors.toList());
+//                new ArrayList<>();
+//        for (Rental rental : rentals) {
+//                rentalResponses.add(convertToRentalResponse(rental));
+//        }
 
         return new ApiResponse<>(
                 ResponseStatus.SUCCESS,
@@ -297,16 +297,139 @@ public class RentalServiceImpl implements RentalService {
                         LocalDate.now()
                 );
 
-        List<RentalResponse> rentalResponses = new ArrayList<>();
-
-        for (Rental rental : rentals) {
-            rentalResponses.add(convertToRentalResponse(rental));
-        }
+        List<RentalResponse> rentalResponses = rentals.stream().map(this::convertToRentalResponse).collect(Collectors.toList());
+//                new ArrayList<>();
+//        for (Rental rental : rentals) {
+//            rentalResponses.add(convertToRentalResponse(rental));
+//        }
 
         return new ApiResponse<>(
                 ResponseStatus.SUCCESS,
                 "Overdue rentals fetched successfully",
                 rentalResponses
+        );
+    }
+
+    @Override
+    public ApiResponse<Long> getActiveRentalCount() {
+
+        List<Rental> rentals = rentalRepository.findAll();
+
+        long activeRentalCount = rentals.stream().filter(rental ->rental.getStatus() == RentalStatus.RENTED ).count();
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                "Active rental count fetched successfully",
+                activeRentalCount
+        );
+    }
+
+    @Override
+    public ApiResponse<Map<RentalStatus, Long>> getRentalCountByStatus() {
+
+        Map<RentalStatus, Long> rentalCount = rentalRepository.findAll().stream().collect(Collectors.groupingBy(Rental::getStatus, Collectors.counting()));
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                "Rental count by status fetched successfully",
+                rentalCount
+        );
+    }
+
+    @Override
+    public ApiResponse<Map<String, Long>> getRentalCountByUser() {
+
+        Map<String, Long> rentalCountByUser =
+                rentalRepository.findAll()
+                        .stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        rental ->
+                                                rental.getUser().getName(),
+                                        Collectors.counting()
+                                )
+                        );
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                "User-wise rental count fetched successfully",
+                rentalCountByUser
+        );
+    }
+
+    @Override
+    public ApiResponse<Map<Boolean, List<RentalResponse>>> partitionRentalsByOverdueStatus() {
+
+        Map<Boolean, List<RentalResponse>> result =
+                rentalRepository.findAll()
+                        .stream()
+                        .collect(
+                                Collectors.partitioningBy(
+                                        rental ->
+                                                rental.getStatus()
+                                                        == RentalStatus.RENTED
+                                                        && rental.getDueDate()
+                                                        .isBefore(LocalDate.now()),
+                                        Collectors.mapping(
+                                                this::convertToRentalResponse,
+                                                Collectors.toList()
+                                        )
+                                )
+                        );
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                "Rentals partitioned by overdue status successfully",
+                result
+        );
+    }
+
+    @Override
+    public ApiResponse<RentalResponse> getHighestFineRental() {
+
+        Rental rental = rentalRepository.findAll()
+                .stream()
+                .filter(currentRental ->
+                        currentRental.getFineAmount() != null
+                )
+                .max(
+                        Comparator.comparing(
+                                Rental::getFineAmount
+                        )
+                )
+                .orElseThrow(() ->
+                        new RentalNotFoundException(
+                                "No rental records found"
+                        )
+                );
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                "Highest fine rental fetched successfully",
+                convertToRentalResponse(rental)
+        );
+    }
+
+    @Override
+    public ApiResponse<Double> getTotalFineCollected() {
+
+        double totalFine =
+                rentalRepository.findAll()
+                        .stream()
+                        .map(rental ->
+                                rental.getFineAmount() == null
+                                        ? 0.0
+                                        : rental.getFineAmount()
+                        )
+                        .reduce(
+                                0.0,
+                                Double::sum
+                        );
+
+        return new ApiResponse<>(
+                ResponseStatus.SUCCESS,
+                "Total fine calculated successfully",
+                totalFine
         );
     }
 

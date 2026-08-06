@@ -1,9 +1,11 @@
 
 package org.bookrental.controller;
 
+import org.bookrental.common.enums.ResponseStatus;
 import org.bookrental.dto.common.ApiResponse;
 import org.bookrental.dto.request.BookRequest;
 import org.bookrental.dto.response.BookResponse;
+import org.bookrental.dto.response.RentalResponse;
 import org.bookrental.entity.Book;
 import org.bookrental.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/books")
@@ -72,4 +75,40 @@ public class BookController {
                 )
         );
     }
+
+    @GetMapping("/available")
+    public ResponseEntity<ApiResponse<List<BookResponse>>> getAvailableBooks(){
+
+        return ResponseEntity.ok(bookService.getAvailableBooks());
+    }
+
+    @GetMapping("/category/available")
+    public ResponseEntity<ApiResponse<Boolean>> isCategoryAvailable(@RequestParam String category) {
+
+        return ResponseEntity.ok(
+                bookService.isCategoryAvailable(category)
+        );
+    }
+
+    public ResponseEntity<ApiResponse<BookResponse>> getFirstAvailableBookByCategory(@RequestParam String category)
+    {
+        return ResponseEntity.ok(bookService.getFirstAvailableBookByCategory(category));
+    }
+
+    @GetMapping("/sort/available-copies")
+    public ResponseEntity<ApiResponse<List<BookResponse>>> getBooksSortedByAvailableCopies() {
+
+        return ResponseEntity.ok(bookService.getBooksSortedByAvailableCopies()
+        );
+    }
+
+    @GetMapping("/category/count")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getBookCountByCategory() {
+
+        return ResponseEntity.ok(
+                bookService.getBookCountByCategory()
+        );
+    }
+
+
 }

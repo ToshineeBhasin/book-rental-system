@@ -1,5 +1,6 @@
 package org.bookrental.controller;
 
+import org.bookrental.common.enums.RentalStatus;
 import org.bookrental.dto.common.ApiResponse;
 import org.bookrental.dto.request.RentalRequest;
 import org.bookrental.dto.response.RentalResponse;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -80,5 +82,52 @@ public class RentalController {
         );
     }
 
+    @GetMapping("/active/count")
+    public ResponseEntity<ApiResponse<Long>> getActiveRentalCount() {
+
+        return ResponseEntity.ok(
+                rentalService.getActiveRentalCount()
+        );
+    }
+
+    @GetMapping("/status/count")
+    public ResponseEntity<ApiResponse<Map<RentalStatus, Long>>> getRentalCountByStatus() {
+
+        return ResponseEntity.ok(
+                rentalService.getRentalCountByStatus()
+        );
+    }
+
+    @GetMapping("/user/count")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getRentalCountByUser() {
+
+        return ResponseEntity.ok(
+                rentalService.getRentalCountByUser()
+        );
+    }
+
+    @GetMapping("/overdue/partition")
+    public ResponseEntity<ApiResponse<Map<Boolean, List<RentalResponse>>>> partitionRentalsByOverdueStatus() {
+
+        return ResponseEntity.ok(
+                rentalService.partitionRentalsByOverdueStatus()
+        );
+    }
+
+    @GetMapping("/highest-fine")
+    public ResponseEntity<ApiResponse<RentalResponse>> getHighestFineRental() {
+
+        return ResponseEntity.ok(
+                rentalService.getHighestFineRental()
+        );
+    }
+
+    @GetMapping("/fine/total")
+    public ResponseEntity<ApiResponse<Double>> getTotalFineCollected() {
+
+        return ResponseEntity.ok(
+                rentalService.getTotalFineCollected()
+        );
+    }
 
 }

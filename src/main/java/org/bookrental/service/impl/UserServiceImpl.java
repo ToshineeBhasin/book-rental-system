@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -70,19 +71,18 @@ public class UserServiceImpl implements UserService {
 
         List<User> users = userRepository.findAll();
 
-        List<UserResponse> userResponses = new ArrayList<>();
+        List<UserResponse> userResponses = users.stream().map(this::convertToUserResponse).collect(Collectors.toList());
 
-        for (User user : users) {
-
-            UserResponse userResponse = new UserResponse(
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getRole()
-            );
-
-            userResponses.add(userResponse);
-        }
+//                = new ArrayList<>();
+//        for (User user : users) {
+//            UserResponse userResponse = new UserResponse(
+//                    user.getId(),
+//                    user.getName(),
+//                    user.getEmail(),
+//                    user.getRole()
+//            );
+//            userResponses.add(userResponse);
+//        }
 
         return new ApiResponse<>(
                 ResponseStatus.SUCCESS,
@@ -143,6 +143,16 @@ public class UserServiceImpl implements UserService {
                 ResponseStatus.SUCCESS,
                 "User deleted successfully",
                 null
+        );
+    }
+
+    private UserResponse convertToUserResponse(User user) {
+
+        return new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole()
         );
     }
 }
