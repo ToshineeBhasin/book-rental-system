@@ -2,7 +2,7 @@ package org.bookrental.entity;
 
 import org.bookrental.common.enums.Role;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")

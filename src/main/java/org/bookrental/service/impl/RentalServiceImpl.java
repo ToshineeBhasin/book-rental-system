@@ -15,8 +15,8 @@ import org.bookrental.repository.RentalRepository;
 import org.bookrental.repository.UserRepository;
 import org.bookrental.service.RentalService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;

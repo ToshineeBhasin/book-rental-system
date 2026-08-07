@@ -4,7 +4,7 @@ package org.bookrental.entity;
 import org.bookrental.common.enums.RentalStatus;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
